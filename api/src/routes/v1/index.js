@@ -16,10 +16,10 @@ const defaultRoutes = [
     path: '/users',
     route: userRoute,
   },
-  {
-    path: '/images',
-    route: imageRoute,
-  }
+  // {
+  //   path: '/images',
+  //   route: imageRoute,
+  // }
 ];
 
 const devRoutes = [
@@ -31,6 +31,7 @@ const devRoutes = [
 ];
 
 defaultRoutes.forEach((route) => {
+  console.log(route.path);
   router.use(route.path, route.route);
 });
 
