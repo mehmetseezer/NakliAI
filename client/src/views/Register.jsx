@@ -12,6 +12,8 @@ export default function Register() {
     const [confirmationResult, setConfirmationResult] = useState(null);
     const [otpSent, setOtpSent] = useState(false);
     const [isPersonalInfoFormVisible, setIsPersonalInfoFormVisible] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formState, setFormState] = useState({
         otp: '',
         phoneNumber: '',
@@ -24,7 +26,7 @@ export default function Register() {
     const auth = getAuth(firebaseApp);
 
     const isDevelopment = 'development';
-    const devOtpCode = '290629'; // Geliştirme modunda kullanılacak OTP kodu
+    const devOtpCode = '290629';
 
     useEffect(() => {
         if (!isDevelopment) {
@@ -39,6 +41,7 @@ export default function Register() {
 
     const handleInputChange = useCallback((e) => {
         const { name, value } = e.target;
+        console.log(`${name} => ${value}`)
         setFormState((prev) => ({ ...prev, [name]: value }));
     }, []);
 
@@ -105,6 +108,7 @@ export default function Register() {
 
             if (formState.name && formState.email && formState.password && formState.phoneNumber) {
                 try {
+                    console.log(formState);
                     await onRegister(formState.name, formState.email, formState.password, formState.phoneNumber);
                     navigate('/', { replace: true });
                     toast.success('Kayıt Başarılı! Yönlendiriliyorsunuz...');
@@ -180,22 +184,38 @@ export default function Register() {
                             placeholder="Email"
                             className="w-full py-4 px-4 bg-transparent border rounded-md text-white"
                         />
-                        <input
-                            type="password"
-                            name="password"
-                            value={formState.password}
-                            onChange={handleInputChange}
-                            placeholder="Parola"
-                            className="w-full py-4 px-4 bg-transparent border rounded-md text-white"
-                        />
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formState.confirmPassword}
-                            onChange={handleInputChange}
-                            placeholder="Parolayı Doğrulayın"
-                            className="w-full py-4 px-4 bg-transparent border rounded-md text-white"
-                        />
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                value={formState.password}
+                                onChange={handleInputChange}
+                                placeholder="Parola"
+                                className="w-full py-4 px-4 bg-transparent border rounded-md text-white"
+                            />
+                            <button
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 px-4 py-2 text-white"
+                            >
+                                {showPassword ? '🙈' : '👁️'}
+                            </button>
+                        </div>
+                        <div className="relative">
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                name="confirmPassword"
+                                value={formState.confirmPassword}
+                                onChange={handleInputChange}
+                                placeholder="Parolayı Doğrulayın"
+                                className="w-full py-4 px-4 bg-transparent border rounded-md text-white"
+                            />
+                            <button
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute inset-y-0 right-0 px-4 py-2 text-white"
+                            >
+                                {showConfirmPassword ? '🙈' : '👁️'}
+                            </button>
+                        </div>
                         <button disabled={isLoading} onClick={handleRegister} className="disabled:opacity-50 w-full py-4 bg-teal-500 text-white rounded-md">
                             {isLoading ? 'Yükleniyor...' : 'Kayıt Ol'}
                         </button>

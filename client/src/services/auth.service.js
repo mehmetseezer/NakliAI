@@ -10,7 +10,7 @@ const authService = {
     },
 
     register: async (name, email, password, phone) => {
-        return (await api.post('/auth/register'), { name, email, password, phone }).data;
+        return (await api.post('/auth/register', { name, email, password, phone })).data;
     },
 
     refreshTokens: async (refreshToken) => {
