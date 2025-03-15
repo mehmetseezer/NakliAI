@@ -33,6 +33,27 @@ docker-compose up --build -d
 docker-compose ps
 ```
 
+### 3. 3. NakliAI Veritabanını oluşturun
+- **mongosh** Yüklü mü Kontrol Et
+``` bash
+mongosh --version
+```
+- MongoDB'ye bağlanın
+``` bash
+mongosh
+```
+- Veritabanlarını Listeleyin
+``` bash
+show dbs
+```
+- Nakliai Veritabanını ekleyin
+``` bash
+use nakliai
+```
+
+
+
+
 ### 3. Yönetici Paneli Erişimi
 URL: http://localhost:3000/v1/docs
 ## 🛠️ Kullanılan Teknolojiler
