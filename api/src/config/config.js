@@ -24,6 +24,8 @@ const envVarsSchema = Joi.object()
     FIREBASE_PRIVATE_KEY: Joi.string().required().description('Firebase Private Key'),
     FIREBASE_CLIENT_EMAIL: Joi.string().required().description('Firebase Client Email'),
     FIREBASE_CLIENT_ID: Joi.string().required().description('Firebase Client ID'),
+    // Selenium config
+    SELENIUM_HUB_URL: Joi.string().required().description('Selenium Hub URL'),
   })
   .unknown();
 
@@ -63,5 +65,8 @@ module.exports = {
     privateKey: envVars.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Ensure private key format
     clientEmail: envVars.FIREBASE_CLIENT_EMAIL,
     clientId: envVars.FIREBASE_CLIENT_ID,
+  },
+  selenium: {
+    hubUrl: envVars.SELENIUM_HUB_URL, // Selenium Hub URL
   },
 };

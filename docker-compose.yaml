@@ -23,9 +23,11 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - MONGO_URI=mongodb://root:example@mongodb:27017/nakliai
+      - MONGO_URI=mongodb://root:example@mongodb:27017/nakliai?authSource=admin
+      - SELENIUM_HUB_URL=http://selenium:4444/wd/hub
     depends_on:
       - mongodb
+      - selenium
     command: npm start
 
   client:
@@ -41,5 +43,20 @@ services:
       - NODE_ENV=development
     command: npm run dev
 
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    shm_size: 2g
+    environment:
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    volumes:
+      - /dev/shm:/dev/shm
+      - selenium-profile:/home/seluser/.config/google-chrome  # Tarayıcı profilini kalıcı hale getir
+    user: seluser  # Kullanıcıyı belirtin (Selenium container'ı için gerekli)
+
 volumes:
   mongo-data:
+  selenium-profile:  # Selenium tarayıcı profili için volume
