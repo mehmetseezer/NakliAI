@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 5173
 
 # Uygulamayı çalıştır
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--host"]

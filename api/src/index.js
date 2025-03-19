@@ -31,8 +31,7 @@ async function connectToSelenium() {
     logger.info('Connected to Selenium');
 
     // Örnek: Bir websitesi aç
-    await driver.get('https://web.whatsapp.com/');
-    const xpath = '/html/body/div[1]/div/div/div[3]/div/div[3]/div/div[3]/div[2]/div/div/div[1]';
+    await driver.get('https://google.com');
     // const element = await driver.wait(
     //   until.elementLocated(By.xpath(xpath)), // Elementin bulunmasını bekleyin
     //   10000 // Maksimum 10 saniye bekleyin

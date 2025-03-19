@@ -41,7 +41,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-    command: npm run dev
+    command: npm run dev -- --host
 
   selenium:
     image: selenium/standalone-chrome:latest
