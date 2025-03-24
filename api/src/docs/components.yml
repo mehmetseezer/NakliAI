@@ -39,6 +39,113 @@ components:
         refresh:
           $ref: '#/components/schemas/Token'
 
+    Transporter:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [transporter]
+        vehicleType:
+          type: string
+        licensePlate:
+          type: string
+      example:
+        id: 5ebac534954b54139806c113
+        email: transporter@example.com
+        name: John Doe
+        role: transporter
+        vehicleType: Truck
+        licensePlate: 34ABC123
+
+    Intermediary:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [intermediary]
+        companyName:
+          type: string
+        taxNumber:
+          type: string
+      example:
+        id: 5ebac534954b54139806c114
+        email: intermediary@example.com
+        name: Jane Smith
+        role: intermediary
+        companyName: ABC Logistics
+        taxNumber: 1234567890
+
+    FactoryOwner:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [factoryOwner]
+        factoryName:
+          type: string
+        address:
+          type: string
+      example:
+        id: 5ebac534954b54139806c115
+        email: factoryowner@example.com
+        name: Michael Brown
+        role: factoryOwner
+        factoryName: XYZ Manufacturing
+        address: 123 Industrial Zone, City, Country
+
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [pending, inProgress, completed]
+        createdBy:
+          type: string
+        assignedTo:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      example:
+        id: 5ebac534954b54139806c116
+        title: Transport Goods
+        description: Transport goods from Factory A to Warehouse B
+        status: pending
+        createdBy: 5ebac534954b54139806c115
+        assignedTo: 5ebac534954b54139806c113
+        createdAt: 2023-10-01T12:00:00Z
+        updatedAt: 2023-10-01T12:00:00Z
+
     Error:
       type: object
       properties:

@@ -1,256 +1,155 @@
 const express = require('express');
-const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
-const userValidation = require('../../validations/user.validation');
-const userController = require('../../controllers/user.controller');
-
 const router = express.Router();
+const { uploadMiddleware } = require('../../middlewares/multer');
+const imageController = require('../../controllers/image.controller');
 
-router
-  .route('/')
-  .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)
-  .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
-
-router
-  .route('/:userId')
-  .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-  .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
-  .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
-
-module.exports = router;
+// Route'lar
+router.post('/upload', uploadMiddleware, imageController.uploadImage);
+router.post('/process', imageController.processAndResizeImage);
+router.delete('/delete', imageController.deleteImageHandler);
+router.get('/get', imageController.getImageHandler);
+router.put('/update', imageController.updateImageHandler);
 
 /**
  * @swagger
  * tags:
- *   name: Users
- *   description: User management and retrieval
+ *   name: Images
+ *   description: Resim yönetimi endpoint'leri
  */
 
 /**
  * @swagger
- * /users:
+ * /images/upload:
  *   post:
- *     summary: Create a user
- *     description: Only admins can create other users.
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *               - role
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *                 description: must be unique
- *               password:
- *                 type: string
- *                 format: password
- *                 minLength: 8
- *                 description: At least one number and one letter
- *               phone:
- *                 type: String
- *                 format: phone
- *               role:
- *                  type: string
- *                  enum: [user, admin]
- *             example:
- *               name: fake name
- *               email: fake@example.com
- *               password: password1
- *               phone: 1234567890
- *               role: user
- *     responses:
- *       "201":
- *         description: Created
- *         content:
- *           application/json:
- *             schema:
- *                $ref: '#/components/schemas/User'
- *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *
- *   get:
- *     summary: Get all users
- *     description: Only admins can retrieve all users.
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
+ *     summary: Resim yükleme
+ *     tags: [Images]
+ *     consumes:
+ *       - multipart/form-data
  *     parameters:
- *       - in: query
- *         name: name
- *         schema:
- *           type: string
- *         description: User name
- *       - in: query
- *         name: role
- *         schema:
- *           type: string
- *         description: User role
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *         description: sort by query in the form of field:desc/asc (ex. name:asc)
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *         default: 10
- *         description: Maximum number of users
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number
+ *       - in: formData
+ *         name: image
+ *         type: file
+ *         required: true
+ *         description: Yüklenecek resim dosyası
  *     responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 results:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/User'
- *                 page:
- *                   type: integer
- *                   example: 1
- *                 limit:
- *                   type: integer
- *                   example: 10
- *                 totalPages:
- *                   type: integer
- *                   example: 1
- *                 totalResults:
- *                   type: integer
- *                   example: 1
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
+ *       201:
+ *         description: Resim başarıyla yüklendi
+ *         schema:
+ *           type: object
+ *           properties:
+ *             path:
+ *               type: string
+ *               example: "/uploads/12345.jpg"
+ *       400:
+ *         description: Geçersiz dosya türü veya dosya yok
  */
 
 /**
  * @swagger
- * /users/{id}:
- *   get:
- *     summary: Get a user
- *     description: Logged in users can fetch only their own user information. Only admins can fetch other users.
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
+ * /images/process:
+ *   post:
+ *     summary: Resmi işleme ve boyutlandırma
+ *     tags: [Images]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - in: query
+ *         name: filePath
  *         required: true
- *         schema:
- *           type: string
- *         description: User id
- *     responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *                $ref: '#/components/schemas/User'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "404":
- *         $ref: '#/components/responses/NotFound'
- *
- *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
+ *         type: string
+ *         example: "/uploads/image.jpg"
+ *       - in: query
+ *         name: width
  *         required: true
- *         schema:
- *           type: string
- *         description: User id
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *                 description: must be unique
- *               password:
- *                 type: string
- *                 format: password
- *                 minLength: 8
- *                 description: At least one number and one letter
- *             example:
- *               name: fake name
- *               email: fake@example.com
- *               password: password1
- *     responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *                $ref: '#/components/schemas/User'
- *       "400":
- *         $ref: '#/components/responses/DuplicateEmail'
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "404":
- *         $ref: '#/components/responses/NotFound'
- *
- *   delete:
- *     summary: Delete a user
- *     description: Logged in users can delete only themselves. Only admins can delete other users.
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
+ *         type: integer
+ *         example: 800
+ *       - in: query
+ *         name: height
  *         required: true
- *         schema:
- *           type: string
- *         description: User id
+ *         type: integer
+ *         example: 600
  *     responses:
- *       "200":
- *         description: No content
- *       "401":
- *         $ref: '#/components/responses/Unauthorized'
- *       "403":
- *         $ref: '#/components/responses/Forbidden'
- *       "404":
- *         $ref: '#/components/responses/NotFound'
+ *       200:
+ *         description: İşlenmiş resim yolu
+ *         schema:
+ *           type: object
+ *           properties:
+ *             path:
+ *               type: string
+ *               example: "/uploads/processed_12345.jpg"
+ *       404:
+ *         description: Resim bulunamadı
  */
+
+/**
+ * @swagger
+ * /images/delete:
+ *   delete:
+ *     summary: Resim silme
+ *     tags: [Images]
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             filePath:
+ *               type: string
+ *               example: "/uploads/image.jpg"
+ *     responses:
+ *       204:
+ *         description: Resim başarıyla silindi
+ *       404:
+ *         description: Resim bulunamadı
+ */
+
+/**
+ * @swagger
+ * /images/get:
+ *   get:
+ *     summary: Resmi görüntüleme
+ *     tags: [Images]
+ *     parameters:
+ *       - in: query
+ *         name: filePath
+ *         required: true
+ *         type: string
+ *         example: "/uploads/image.jpg"
+ *     responses:
+ *       200:
+ *         description: Resim binary verisi
+ *         content:
+ *           image/jpeg:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Resim bulunamadı
+ */
+
+/**
+ * @swagger
+ * /images/update:
+ *   put:
+ *     summary: Resim güncelleme
+ *     tags: [Images]
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             oldPath:
+ *               type: string
+ *               example: "/uploads/old.jpg"
+ *             newPath:
+ *               type: string
+ *               example: "/uploads/new.jpg"
+ *     responses:
+ *       200:
+ *         description: Resim başarıyla güncellendi
+ *       404:
+ *         description: Eski resim bulunamadı
+ */
+
+module.exports = router;

@@ -19,8 +19,17 @@ const AuthProvider = ({ children }) => {
     }, []);
 
     const onLogout = useCallback(async () => {
-        if (auth.tokens?.refresh?.token) {
-            await authService.logout(auth.tokens.refresh.token);
+        try {
+            if (auth.tokens?.refresh?.token) {
+                await authService.logout(auth.tokens.refresh.token);
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                setAuth({ user: null, tokens: null });
+                localStorage.clear();
+            } else {
+                throw error;
+            }
         }
         setAuth({ user: null, tokens: null });
         localStorage.clear();
